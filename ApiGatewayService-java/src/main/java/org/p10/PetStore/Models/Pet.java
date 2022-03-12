@@ -1,5 +1,7 @@
 package org.p10.PetStore.Models;
 
+import org.p10.PetStore.Models.Pojo.PetPojo;
+
 import java.util.List;
 
 public class Pet {
@@ -11,6 +13,15 @@ public class Pet {
     private PetStatus status;
 
     public Pet() {
+    }
+
+    public Pet(PetPojo petPojo) {
+        this.id = petPojo.getId();
+        this.category = PetCategory.values()[petPojo.getCategory()];
+        this.name = petPojo.getName();
+        this.photoUrls = petPojo.getPhotoUrls();
+        this.tags = petPojo.getTags();
+        this.status = PetStatus.values()[petPojo.getStatus()];
     }
 
     public Pet(int id, PetCategory category, String name, List<String> photoUrls, String tags, PetStatus status) {

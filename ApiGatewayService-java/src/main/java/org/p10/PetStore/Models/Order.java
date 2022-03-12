@@ -1,19 +1,30 @@
 package org.p10.PetStore.Models;
 
-import java.sql.Date;
+import org.p10.PetStore.Models.Pojo.OrderPojo;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Order {
     private int id;
     private int petId;
     private int quantity;
-    private Date shipDate;
+    private LocalDateTime shipDate;
     private OrderStatus status;
     private boolean complete;
 
-    public Order() {
+    public Order(OrderPojo orderPojo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LocalDateTime dateTime = LocalDateTime.parse(orderPojo.getShipDate(), formatter);
+        this.id = orderPojo.getId();
+        this.petId = orderPojo.getPetId();
+        this.quantity = orderPojo.getQuantity();
+        this.shipDate = dateTime;
+        this.status = OrderStatus.values()[orderPojo.getStatus()];
+        this.complete = orderPojo.isComplete();
     }
 
-    public Order(int id, int petId, int quantity, Date shipDate, OrderStatus status, boolean complete) {
+    public Order(int id, int petId, int quantity, LocalDateTime shipDate, OrderStatus status, boolean complete) {
         this.id = id;
         this.petId = petId;
         this.quantity = quantity;
@@ -46,11 +57,11 @@ public class Order {
         this.quantity = quantity;
     }
 
-    public Date getShipDate() {
+    public LocalDateTime getShipDate() {
         return shipDate;
     }
 
-    public void setShipDate(Date shipDate) {
+    public void setShipDate(LocalDateTime shipDate) {
         this.shipDate = shipDate;
     }
 

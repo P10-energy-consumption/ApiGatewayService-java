@@ -1,5 +1,7 @@
 package org.p10.PetStore.Models;
 
+import org.p10.PetStore.Models.Pojo.UserPojo;
+
 public class User {
     private int id;
     private String userName;
@@ -12,6 +14,18 @@ public class User {
     private UserStatus status;
 
     public User() {
+    }
+
+    public User(UserPojo userPojo) {
+        this.id = userPojo.getId();
+        this.userName = userPojo.getUserName();
+        this.firstName = userPojo.getFirstName();
+        this.lastName = userPojo.getLastName();
+        this.email = userPojo.getEmail();
+        this.passwordHash = userPojo.getPasswordHash();
+        this.salt = userPojo.getSalt();
+        this.phone = userPojo.getPhone();
+        this.status = UserStatus.values()[userPojo.getStatus()];
     }
 
     public User(int id, String userName, String firstName, String lastName, String email, String passwordHash, String salt, String phone, UserStatus status) {

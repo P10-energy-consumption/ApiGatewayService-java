@@ -1,132 +1,119 @@
 package org.p10.PetStore.Repositories;
 
-import org.p10.PetStore.Database.ConnectionFactory;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import org.json.JSONObject;
 import org.p10.PetStore.Models.*;
+import org.p10.PetStore.Models.Pojo.OrderPojo;
 import org.p10.PetStore.Repositories.Interfaces.IStoreRepositories;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.p10.PetStore.Repositories.HTTPUtil.*;
+
 public class StoreRepository implements IStoreRepositories {
 
-    private final Connection connection;
+    private final String url;
+    private final Gson gson;
 
     public StoreRepository() {
-        connection = new ConnectionFactory().createDBConnection();
+        this.url = "http://host.docker.internal:8083/v1";
+        this.gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateDeserializer())
+                .create();
+    }
+
+    static class LocalDateAdapter implements JsonSerializer<LocalDateTime> {
+        public JsonElement serialize(LocalDateTime date, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")));
+        }
+    }
+    static class LocalDateDeserializer implements JsonDeserializer<LocalDateTime> {
+        public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
+            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        }
     }
 
     @Override
     public List<InventoryLine> getInventory() {
-        List<InventoryLine> inventoryLineList = new ArrayList<>();
-        PreparedStatement stmt;
+        HttpURLConnection con = null;
         try {
-            stmt = connection.prepareStatement(
-                    "select Status, count(Id) from pets.pet " +
-                            "where IsDelete = FALSE group by Status"
-            );
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                InventoryLine inventoryLine = new InventoryLine();
-                inventoryLine.setStatus(PetStatus.values()[rs.getInt("Status")]);
-                inventoryLine.setCount(rs.getInt("Count"));
-
-                inventoryLineList.add(inventoryLine);
+            con = getConnection(this.url + "/store/inventory", "GET");
+            String response = getHTTPResponse(con);
+            if (response != null) {
+                // Deserialize List of InventoryLine objects
+                Type listOfInventoryType = new TypeToken<ArrayList<InventoryLine>>(){}.getType();
+                return gson.fromJson(response, listOfInventoryType);
+            } else {
+                return null;
             }
-            stmt.close();
-            connection.close();
-
-            return inventoryLineList;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-
-            return null;
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
         }
     }
 
     @Override
     public Order getOrders(int orderId) {
-        Order order = null;
-        PreparedStatement stmt;
+        HttpURLConnection con = null;
         try {
-            stmt = connection.prepareStatement("select Id, Status, PetId, Quantity, " +
-                    "ShipDate, Complete " +
-                    "from orders.order where IsDelete = FALSE and id = ?");
-            stmt.setInt(1, orderId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                order = new Order();
-                order.setId(rs.getInt("id"));
-                order.setPetId(rs.getInt("petId"));
-                order.setQuantity(rs.getInt("quantity"));
-                order.setShipDate(rs.getDate("shipDate"));
-                order.setStatus(OrderStatus.values()[rs.getInt("status")]);
-                order.setComplete(rs.getBoolean("complete"));
+            con = getConnection(this.url + "/store/order/" + orderId, "GET");
+            return new Order(gson.fromJson(getHTTPResponse(con), OrderPojo.class));
+        } finally {
+            if (con != null) {
+                con.disconnect();
             }
-            stmt.close();
-            connection.close();
-
-            return order;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-
-            return null;
         }
     }
 
     @Override
-    public Order postOrder(Order order) {
-        PreparedStatement stmt;
+    public Order postOrder(OrderPojo order) {
+        String json = gson.toJson(order);
+        JSONObject jsonObject = new JSONObject(json);
+
+        HttpURLConnection con = null;
         try {
-            stmt = connection.prepareStatement(
-                    "insert into orders.order (id, petid, quantity, shipdate, status, complete, created, createdby) " +
-                            "values (?, ?, ?, ?, ?, ?, current_timestamp, 'PetStore.Store.Api');"
-            );
-            stmt.setInt(1, order.getId());
-            stmt.setInt(2, order.getPetId());
-            stmt.setInt(3, order.getQuantity());
-            stmt.setDate(4, order.getShipDate());
-            stmt.setInt(5, order.getStatus().ordinal());
-            stmt.setBoolean(6, order.isComplete());
-            stmt.executeUpdate();
-
-            stmt.close();
-            connection.close();
-
-            return order;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-
-            return null;
+            con = getConnection(this.url + "/store/order", "POST");
+            sendHTTPRequest(con, jsonObject);
+            String response = getHTTPResponse(con);
+            if (response != null) {
+                return new Order(gson.fromJson(response, OrderPojo.class));
+            } else {
+                return null;
+            }
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
         }
     }
 
     @Override
     public int deleteOrder(int orderId) {
-        PreparedStatement stmt;
+        HttpURLConnection con = null;
         try {
-            stmt = connection.prepareStatement(
-                    "DELETE FROM orders.order where id=?"
-            );
-            stmt.setInt(1, orderId);
-            int affectedRows = stmt.executeUpdate();
-
-            stmt.close();
-            connection.close();
-
-            return affectedRows;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-
-            return 0;
+            con = getConnection(this.url + "/store/order/" + orderId, "DELETE");
+            String response = getHTTPResponse(con);
+            if (response != null) {
+                return Integer.parseInt(response);
+            } else {
+                return 0;
+            }
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
         }
     }
 }

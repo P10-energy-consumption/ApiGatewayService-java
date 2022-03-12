@@ -5,6 +5,12 @@ public class PetPhotoPojo {
     private String metaData;
     private String file;
 
+    public PetPhotoPojo(int petID, String metaData, String file) {
+        this.petID = petID;
+        this.metaData = metaData;
+        this.file = file;
+    }
+
     public int getPetID() {
         return petID;
     }

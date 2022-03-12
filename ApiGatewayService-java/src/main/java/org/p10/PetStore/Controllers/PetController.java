@@ -25,8 +25,8 @@ public class PetController {
     @Path("/pet/{id}")
     @Produces("text/plain")
     public Response getPet(@PathParam("id") int petId) {
-        Pet pet = petRepository.getPet(petId);
-        return Response.ok(pet).build();
+        Pet response = petRepository.getPet(petId);
+        return Response.ok(response).build();
     }
 
     @POST
@@ -36,9 +36,9 @@ public class PetController {
         Pet pet = new Pet(petPojo.getId(), PetCategory.values()[petPojo.getCategory()],
                 petPojo.getName(), petPojo.getPhotoUrls(),
                 petPojo.getTags(), PetStatus.values()[petPojo.getStatus()]);
-        int rowId = petRepository.insertPet(pet);
-        if (rowId > 0) {
-            return Response.ok(pet).build();
+        int response = petRepository.insertPet(pet);
+        if (response > 0) {
+            return Response.ok(response).build();
         } else {
             return Response.serverError().build();
         }
@@ -51,9 +51,9 @@ public class PetController {
         Pet pet = new Pet(petPojo.getId(), PetCategory.values()[petPojo.getCategory()],
                 petPojo.getName(), petPojo.getPhotoUrls(),
                 petPojo.getTags(), PetStatus.values()[petPojo.getStatus()]);
-        int affectedRows = petRepository.updatePet(pet);
-        if (affectedRows > 0) {
-            return Response.ok().build();
+        int response = petRepository.updatePet(pet);
+        if (response > 0) {
+            return Response.ok(response).build();
         } else {
             return Response.serverError().build();
         }
@@ -65,10 +65,10 @@ public class PetController {
     public Response insertPetPhoto(PetPhotoPojo petPhotoPojo) {
         UUID photoId = UUID.randomUUID();
         String fileUrl = "/some/url/" + photoId;
-        int rowId = petRepository.insertPetPhoto(photoId, petPhotoPojo.getPetID(),
+        int response = petRepository.insertPetPhoto(photoId, petPhotoPojo.getPetID(),
                 petPhotoPojo.getMetaData(), fileUrl);
-        if (rowId > 0) {
-            return Response.ok().build();
+        if (response > 0) {
+            return Response.ok(response).build();
         } else {
             return Response.serverError().build();
         }
@@ -78,9 +78,9 @@ public class PetController {
     @Path("/pet/{petId}")
     @Produces("text/plain")
     public Response deletePet(@PathParam("petId") int petId) {
-        int affectedRows = petRepository.deletePet(petId);
-        if (affectedRows > 0) {
-            return Response.ok().build();
+        int response = petRepository.deletePet(petId);
+        if (response > 0) {
+            return Response.ok(response).build();
         } else {
             return Response.serverError().build();
         }
@@ -90,7 +90,7 @@ public class PetController {
     @Path("/pet/findByStatus")
     @Produces("text/plain")
     public Response getPetByStatus(@QueryParam("petStatus") int petStatus) {
-        List<Pet> petList = petRepository.getPetByStatus(PetStatus.values()[petStatus]);
-        return Response.ok(petList).build();
+        List<Pet> response = petRepository.getPetByStatus(PetStatus.values()[petStatus]);
+        return Response.ok(response).build();
     }
 }

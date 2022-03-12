@@ -24,7 +24,11 @@ public class StoreController {
     @Produces("text/plain")
     public Response getInventory() {
         List<InventoryLine> inventory = storeRepository.getInventory();
-        return Response.ok(inventory).build();
+        if (inventory != null) {
+            return Response.ok(inventory).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @GET
@@ -32,18 +36,23 @@ public class StoreController {
     @Produces("text/plain")
     public Response getOrder(@PathParam("id") int orderId) {
         Order order = storeRepository.getOrders(orderId);
-        return Response.ok(order).build();
+        if (order != null) {
+            return Response.ok(order).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @POST
     @Path("/store/order")
     @Produces("text/plain")
     public Response placeOrder(OrderPojo orderPojo) {
-        Order order = new Order(orderPojo.getId(), orderPojo.getPetId(),
-                orderPojo.getQuantity(), orderPojo.getShipDate(),
-                OrderStatus.values()[orderPojo.getStatus()], orderPojo.isComplete());
-        order = storeRepository.postOrder(order);
-        return Response.ok(order).build();
+        Order o = storeRepository.postOrder(orderPojo);
+        if (o != null) {
+            return Response.ok(o).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @DELETE
@@ -52,7 +61,7 @@ public class StoreController {
     public Response deleteOrder(@PathParam("id") int orderId) {
         int affectedRows = storeRepository.deleteOrder(orderId);
         if (affectedRows > 0) {
-            return Response.ok().build();
+            return Response.ok(affectedRows).build();
         } else {
             return Response.serverError().build();
         }
