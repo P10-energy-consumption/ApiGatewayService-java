@@ -1,7 +1,5 @@
 package org.p10.PetStore.Repositories;
 
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,10 +24,10 @@ public class HTTPUtil {
         }
     }
 
-    public static void sendHTTPRequest(HttpURLConnection con, JSONObject json) {
+    public static void sendHTTPRequest(HttpURLConnection con, String request) {
         if (con != null) {
             try(OutputStream os = con.getOutputStream()) {
-                byte[] input = json.toString().getBytes(StandardCharsets.UTF_8);
+                byte[] input = request.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             } catch (IOException e) {
                 e.printStackTrace();

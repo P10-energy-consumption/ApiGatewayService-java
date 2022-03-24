@@ -1,7 +1,6 @@
 package org.p10.PetStore.Repositories;
 
 import com.google.gson.Gson;
-import org.json.JSONObject;
 import org.p10.PetStore.Models.Pojo.UserPojo;
 import org.p10.PetStore.Models.User;
 import org.p10.PetStore.Repositories.Interfaces.IUserRepositories;
@@ -21,14 +20,11 @@ public class UserRepository implements IUserRepositories {
     }
 
     @Override
-    public int insertUser(User user) {
-        String json = gson.toJson(user);
-        JSONObject jsonObject = new JSONObject(json);
-
+    public int insertUser(String request) {
         HttpURLConnection con = null;
         try {
             con = getConnection(this.url + "/user", "POST");
-            sendHTTPRequest(con, jsonObject);
+            sendHTTPRequest(con, request);
             String response = getHTTPResponse(con);
             if (response != null) {
                 return Integer.parseInt(response);
@@ -56,14 +52,11 @@ public class UserRepository implements IUserRepositories {
     }
 
     @Override
-    public User updateUser(User user) {
-        String json = gson.toJson(user);
-        JSONObject jsonObject = new JSONObject(json);
-
+    public User updateUser(String request) {
         HttpURLConnection con = null;
         try {
             con = getConnection(this.url + "/user", "PUT");
-            sendHTTPRequest(con, jsonObject);
+            sendHTTPRequest(con, request);
             return new User(gson.fromJson(getHTTPResponse(con), UserPojo.class));
         } finally {
             if (con != null) {

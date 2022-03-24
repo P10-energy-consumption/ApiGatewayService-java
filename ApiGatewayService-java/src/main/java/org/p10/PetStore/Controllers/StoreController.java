@@ -2,11 +2,10 @@ package org.p10.PetStore.Controllers;
 
 import org.p10.PetStore.Models.InventoryLine;
 import org.p10.PetStore.Models.Order;
-import org.p10.PetStore.Models.Pojo.OrderPojo;
-import org.p10.PetStore.Models.OrderStatus;
 import org.p10.PetStore.Repositories.StoreRepository;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class StoreController {
 
     @GET
     @Path("/store/inventory")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response getInventory() {
         List<InventoryLine> inventory = storeRepository.getInventory();
         if (inventory != null) {
@@ -33,7 +32,7 @@ public class StoreController {
 
     @GET
     @Path("/store/order/{id}")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response getOrder(@PathParam("id") int orderId) {
         Order order = storeRepository.getOrders(orderId);
         if (order != null) {
@@ -45,9 +44,9 @@ public class StoreController {
 
     @POST
     @Path("/store/order")
-    @Produces("text/plain")
-    public Response placeOrder(OrderPojo orderPojo) {
-        Order o = storeRepository.postOrder(orderPojo);
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response placeOrder(String request) {
+        Order o = storeRepository.postOrder(request);
         if (o != null) {
             return Response.ok(o).build();
         } else {
@@ -57,7 +56,7 @@ public class StoreController {
 
     @DELETE
     @Path("/store/order/{id}")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response deleteOrder(@PathParam("id") int orderId) {
         int affectedRows = storeRepository.deleteOrder(orderId);
         if (affectedRows > 0) {

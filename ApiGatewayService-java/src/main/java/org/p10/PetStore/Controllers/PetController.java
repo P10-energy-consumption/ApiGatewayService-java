@@ -5,12 +5,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.p10.PetStore.Models.*;
-import org.p10.PetStore.Models.Pojo.PetPhotoPojo;
-import org.p10.PetStore.Models.Pojo.PetPojo;
 import org.p10.PetStore.Repositories.PetRepository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Path("/v1")
 public class PetController {
@@ -23,7 +20,7 @@ public class PetController {
 
     @GET
     @Path("/pet/{id}")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response getPet(@PathParam("id") int petId) {
         Pet response = petRepository.getPet(petId);
         return Response.ok(response).build();
@@ -32,11 +29,8 @@ public class PetController {
     @POST
     @Path("/pet")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response insertPet(PetPojo petPojo) {
-        Pet pet = new Pet(petPojo.getId(), PetCategory.values()[petPojo.getCategory()],
-                petPojo.getName(), petPojo.getPhotoUrls(),
-                petPojo.getTags(), PetStatus.values()[petPojo.getStatus()]);
-        int response = petRepository.insertPet(pet);
+    public Response insertPet(String request) {
+        int response = petRepository.insertPet(request);
         if (response > 0) {
             return Response.ok(response).build();
         } else {
@@ -46,12 +40,9 @@ public class PetController {
 
     @PUT
     @Path("/pet")
-    @Produces("text/plain")
-    public Response updatePet(PetPojo petPojo) {
-        Pet pet = new Pet(petPojo.getId(), PetCategory.values()[petPojo.getCategory()],
-                petPojo.getName(), petPojo.getPhotoUrls(),
-                petPojo.getTags(), PetStatus.values()[petPojo.getStatus()]);
-        int response = petRepository.updatePet(pet);
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response updatePet(String request) {
+        int response = petRepository.updatePet(request);
         if (response > 0) {
             return Response.ok(response).build();
         } else {
@@ -61,12 +52,9 @@ public class PetController {
 
     @POST
     @Path("/pet/{petId}/uploadImage")
-    @Produces("text/plain")
-    public Response insertPetPhoto(PetPhotoPojo petPhotoPojo) {
-        UUID photoId = UUID.randomUUID();
-        String fileUrl = "/some/url/" + photoId;
-        int response = petRepository.insertPetPhoto(photoId, petPhotoPojo.getPetID(),
-                petPhotoPojo.getMetaData(), fileUrl);
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response insertPetPhoto(@PathParam("petId") int petId, String request) {
+        int response = petRepository.insertPetPhoto(petId, request);
         if (response > 0) {
             return Response.ok(response).build();
         } else {
@@ -76,7 +64,7 @@ public class PetController {
 
     @DELETE
     @Path("/pet/{petId}")
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response deletePet(@PathParam("petId") int petId) {
         int response = petRepository.deletePet(petId);
         if (response > 0) {

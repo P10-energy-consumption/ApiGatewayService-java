@@ -2,7 +2,6 @@ package org.p10.PetStore.Repositories;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import org.json.JSONObject;
 import org.p10.PetStore.Models.*;
 import org.p10.PetStore.Models.Pojo.OrderPojo;
 import org.p10.PetStore.Repositories.Interfaces.IStoreRepositories;
@@ -12,7 +11,6 @@ import java.net.HttpURLConnection;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,16 +25,10 @@ public class StoreRepository implements IStoreRepositories {
         this.url = "http://host.docker.internal:8083/v1";
         this.gson = new GsonBuilder()
                 .setPrettyPrinting()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateDeserializer())
                 .create();
     }
 
-    static class LocalDateAdapter implements JsonSerializer<LocalDateTime> {
-        public JsonElement serialize(LocalDateTime date, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")));
-        }
-    }
     static class LocalDateDeserializer implements JsonDeserializer<LocalDateTime> {
         public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
@@ -78,14 +70,11 @@ public class StoreRepository implements IStoreRepositories {
     }
 
     @Override
-    public Order postOrder(OrderPojo order) {
-        String json = gson.toJson(order);
-        JSONObject jsonObject = new JSONObject(json);
-
+    public Order postOrder(String request) {
         HttpURLConnection con = null;
         try {
             con = getConnection(this.url + "/store/order", "POST");
-            sendHTTPRequest(con, jsonObject);
+            sendHTTPRequest(con, request);
             String response = getHTTPResponse(con);
             if (response != null) {
                 return new Order(gson.fromJson(response, OrderPojo.class));

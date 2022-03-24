@@ -9,6 +9,6 @@ import java.util.List;
 public interface IStoreRepositories {
     List<InventoryLine> getInventory();
     Order getOrders(int orderId);
-    Order postOrder(OrderPojo order);
+    Order postOrder(String request);
     int deleteOrder(int orderId);
 }
