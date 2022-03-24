@@ -3,9 +3,7 @@ package org.p10.PetStore.Repositories.Interfaces;
 import org.p10.PetStore.Models.Pet;
 import org.p10.PetStore.Models.PetStatus;
 
-import javax.ws.rs.core.Request;
 import java.util.List;
-import java.util.UUID;
 
 public interface IPetRepositories {
 

@@ -1,12 +1,12 @@
 package org.p10.PetStore.Controllers;
 
+import org.p10.PetStore.Models.Pet;
+import org.p10.PetStore.Models.PetStatus;
+import org.p10.PetStore.Repositories.PetRepository;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.p10.PetStore.Models.*;
-import org.p10.PetStore.Repositories.PetRepository;
-
 import java.util.List;
 
 @Path("/v1")

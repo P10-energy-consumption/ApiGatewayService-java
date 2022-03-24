@@ -1,5 +1,6 @@
 package org.p10.PetStore.Repositories;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.p10.PetStore.Models.Pet;
 import org.p10.PetStore.Models.PetStatus;
@@ -10,7 +11,6 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import com.google.gson.Gson;
 
 import static org.p10.PetStore.Repositories.HTTPUtil.*;
 

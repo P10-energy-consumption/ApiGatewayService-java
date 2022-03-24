@@ -2,7 +2,8 @@ package org.p10.PetStore.Repositories;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import org.p10.PetStore.Models.*;
+import org.p10.PetStore.Models.InventoryLine;
+import org.p10.PetStore.Models.Order;
 import org.p10.PetStore.Models.Pojo.OrderPojo;
 import org.p10.PetStore.Repositories.Interfaces.IStoreRepositories;
 
