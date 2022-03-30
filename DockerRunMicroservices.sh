@@ -7,8 +7,8 @@ cd .. && cd .. && cd user-service-v1-java/user-service-v1-java && mvn clean inst
 
 cd .. && cd .. && cd store-service-v1-java/store-service-v1-java && mvn clean install && docker build -t petstore-store-java .
 
-docker run --rm -p 8080:8080 petstore-gateway-java &
-docker run --rm -p 8081:8080 petstore-pet-java &
-docker run --rm -p 8082:8080 petstore-user-java &
-docker run --rm -p 8083:8080 petstore-store-java &
+docker run --rm --net=host -p 8080:8080 petstore-gateway-java &
+docker run --rm --net=host -p 8081:8081 petstore-pet-java &
+docker run --rm --net=host -p 8082:8082 petstore-user-java &
+docker run --rm --net=host -p 8083:8083 petstore-store-java &
 wait
