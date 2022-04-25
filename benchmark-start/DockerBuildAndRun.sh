@@ -11,4 +11,3 @@ docker run --rm --add-host=host.docker.internal:host-gateway -p 8080:8080 petsto
 docker run --rm --add-host=host.docker.internal:host-gateway -p 8081:8081 petstore-pet-java &
 docker run --rm --add-host=host.docker.internal:host-gateway -p 8082:8082 petstore-user-java &
 docker run --rm --add-host=host.docker.internal:host-gateway -p 8083:8083 petstore-store-java &
-wait
