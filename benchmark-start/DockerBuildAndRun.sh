@@ -7,7 +7,7 @@ cd .. && cd .. && cd user-service-v1-java/user-service-v1-java && mvn clean inst
 
 cd .. && cd .. && cd store-service-v1-java/store-service-v1-java && mvn clean install && docker build -t petstore-store-java .
 
-docker run --rm --add-host=host.docker.internal:host-gateway -p 8080:8080 petstore-gateway-java &
-docker run --rm --add-host=host.docker.internal:host-gateway -p 8081:8081 petstore-pet-java &
-docker run --rm --add-host=host.docker.internal:host-gateway -p 8082:8082 petstore-user-java &
-docker run --rm --add-host=host.docker.internal:host-gateway -p 8083:8083 petstore-store-java &
+docker run --rm --add-host=host.docker.internal:host-gateway --name petstore-gateway-java -p 8080:8080 petstore-gateway-java &
+docker run --rm --add-host=host.docker.internal:host-gateway --name petstore-pet-java -p 8081:8081 petstore-pet-java &
+docker run --rm --add-host=host.docker.internal:host-gateway --name petstore-user-java -p 8082:8082 petstore-user-java &
+docker run --rm --add-host=host.docker.internal:host-gateway --name petstore-store-java -p 8083:8083 petstore-store-java &
